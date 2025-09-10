@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>I Like You — cute page</title>
+  <style>
+    :root{--accent:#ff6b9a;--bg:#fff7fb}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;margin:0;background:linear-gradient(180deg,var(--bg),#fff);height:100vh;display:flex;align-items:center;justify-content:center}
+    .card{background:white;padding:36px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center;max-width:520px;width:92%}
+    h1{margin:0 0 12px;font-size:28px;color:#333}
+    p{margin:0 0 20px;color:#555}
+    .btn{background:linear-gradient(90deg,var(--accent),#ff9bbf);border:none;color:white;padding:12px 22px;border-radius:999px;font-weight:600;font-size:16px;cursor:pointer;box-shadow:0 6px 18px rgba(255,107,154,.28)}
+    .btn:active{transform:translateY(1px)}
+
+    /* modal */
+    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s}
+    .overlay.show{visibility:visible;opacity:1}
+    .modal{background:linear-gradient(180deg,#fff,#fff0fb);padding:18px;border-radius:14px;max-width:900px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.25);position:relative}
+    .close{position:absolute;right:10px;top:8px;background:transparent;border:0;font-size:26px;cursor:pointer}
+    .media-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    video{max-width:540px;width:100%;border-radius:10px}
+
+    /* falling petals container */
+    .petals{pointer-events:none;position:fixed;inset:0;overflow:hidden;z-index:9999}
+    .petal{position:absolute;top:-10vh;font-size:26px;opacity:0.95;will-change:transform,opacity;user-select:none}
+
+    @media (max-width:640px){h1{font-size:22px}.media-wrap{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>For Kyla Smith Tura🥰</h1>
+    <p>Click the button below and I'll show you something special.</p>
+    <button id="likeBtn" class="btn">Here Be</button>
+  </div>
+
+  <!-- modal + overlay -->
+  <div id="overlay" class="overlay" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <button class="close" id="closeBtn" aria-label="close">✕</button>
+      <div class="media-wrap">
+        <video id="loveVideo" controls autoplay loop>
+          <source src="Kyla.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div style="flex:1;min-width:220px;text-align:left">
+          <h2 style="margin-top:0;color:#333">For you 💕</h2>
+          <p style="color:#444;"> bebs 💕 I want to say sorry. I know I didn’t give you any gifts. I really wanted to, but I couldn’t. I hope you understand. This letter is my small gift to you. I will give you more in the future, I promise.
+
+Thank you for always being there for me. You make me feel safe and happy. I feel very comfortable when I’m with you. That means so much to me.
+
+You are sweet, kind, and patient. I’m really lucky to have you. I don’t forget the good things you do for me. One day, I will make it up to you. I will give you more love and care.
+
+This is just the beginning. Thank you for loving me. I won’t let you down.
+
+-Emmanuel Jay Ceniza</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- petals container -->
+  <div class="petals" id="petals"></div>
+
+  <script>
+    const likeBtn = document.getElementById('likeBtn');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closeBtn');
+    const loveVideo = document.getElementById('loveVideo');
+    const petals = document.getElementById('petals');
+
+    function openModal(){
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      startPetals();
+      loveVideo.currentTime = 0;
+      loveVideo.play().catch(()=>{});
+    }
+
+    function closeModal(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      stopPetals();
+      loveVideo.pause();
+    }
+
+    likeBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+
+    // PETAL EFFECT
+    let petalInterval;
+    function random(min,max){return Math.random()*(max-min)+min}
+
+    function createPetal(){
+      const el = document.createElement('div');
+      el.className = 'petal';
+      el.textContent = '🌸';
+      const size = random(20,48);
+      el.style.fontSize = size+'px';
+      el.style.left = random(0,100)+'vw';
+      el.style.transform = `translateY(-10vh) rotate(${random(0,360)}deg)`;
+      petals.appendChild(el);
+
+      const duration = random(4000,11000);
+      const drift = random(-50,50);
+      el.animate([
+        {transform: `translateY(-10vh) translateX(0) rotate(${random(0,360)}deg)`, opacity:1},
+        {transform: `translateY(110vh) translateX(${drift}px) rotate(${random(360,720)}deg)`, opacity:0.6}
+      ],{duration:duration, easing:'linear'}).onfinish = ()=> el.remove();
+
+      setTimeout(()=>{ if(el.parentNode) el.remove() }, duration+500);
+    }
+
+    function startPetals(){
+      for(let i=0;i<12;i++) createPetal();
+      petalInterval = setInterval(()=>{ createPetal(); }, 550);
+    }
+    function stopPetals(){ clearInterval(petalInterval);
+      Array.from(petals.children).forEach(c=>c.remove());
+    }
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
